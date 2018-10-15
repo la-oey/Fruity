@@ -1,7 +1,7 @@
 var stim = [
 	{produce:"eggplant", adj1:"small", adj2:"big"},
 	{produce:"banana", adj1:"cheap", adj2:"expensive"},
-	{produce:"leek", adj1:"short", adj2:"tall"},
+	{produce:"leek", adj1:"short", adj2:"long"},
 	{produce:"zucchini", adj1:"ugly", adj2:"pretty"},
 	{produce:"watermelon", adj1:"light", adj2:"heavy"},
 	{produce:"clementine", adj1:"dark", adj2:"bright"},

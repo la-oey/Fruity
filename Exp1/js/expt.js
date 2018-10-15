@@ -4,10 +4,6 @@ var trialData = [];
 var Trial = 36; //set by length(stim) //36
 var expt = {
     saveURL: 'submit.simple.php',
-    sona: {
-        //     experiment_id: 1467,
-        // credit_token: '0263273563ac435aaea995b95b9b8169'
-    }
 };
 var client = parseClient();
 var stimList = [];
@@ -146,9 +142,9 @@ function trialDone(){
     // if we are done with all trials, then go to completed page
     if(trialNumber >= Trial){
         // these lines write to server
-        console.log(trialData);
+        //console.log(trialData);
         data = {client: client, trials: trialData};
-        //writeServer(data);
+        writeServer(data);
         document.getElementById('trial').style.display = 'none';
         document.getElementById('completed').style.display = 'block';
     }

@@ -29,6 +29,7 @@ function parseClient(){
 	client.window = {width: $(window).width(), height: $(window).height()};
 	client.screen = {width: screen.width, height: screen.height};
 	client.userAgent = navigator.userAgent;
+	client.timeStart = new Date().getTime(); //get expt start time
 	client.score = 0;
 	client.bonus = 0;
 	return(client);
@@ -103,10 +104,10 @@ function submitExternal(client){
 			postSona(client);
 			break;
 		case 'visitor':
-			window.location = "http://www.evullab.org";
+			window.location = "http://lcl.ucsd.edu/";
 			break;
 		default:
-			window.location = "http://www.evullab.org";
+			window.location = "http://lcl.ucsd.edu/";
 	}
 }
 
