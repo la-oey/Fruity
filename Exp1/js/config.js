@@ -9,3 +9,8 @@ var expt = {
 };
 
 
+function debugLog(message){
+  if(expt.debug){
+    console.log(message);
+  }
+}
