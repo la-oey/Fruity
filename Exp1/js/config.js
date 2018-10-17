@@ -1,12 +1,12 @@
-// experiment settings
-// var expt = {
-// 	name: 'signaling_solo',
-// 	maxTrials: 10,
-//     debug: true,
-//     rmse_threshold: 0.5,
-//     rmse_match: 'color',
-//     saveURL: 'http://experiments.evullab.org/signaling_solo/submit.simple.php',
-// };
+experiment settings
+var expt = {
+	name: 'FruityStudy',
+	maxTrials: 36,
+    debug: true,
+    rmse_threshold: 0.5,
+    rmse_match: 'color',
+    saveURL: 'http://quiz.ucsd.edu/lcl/FruityStudy/submit.simple.php',
+};
 
 
 function debugLog(message){
