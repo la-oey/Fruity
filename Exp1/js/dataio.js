@@ -36,7 +36,7 @@ function readServer(request){
 }            
 
 function writeServer(data){
-	debugLog('initiate server write');
+  debugLog('initiate server write');
   $.ajax({
       dataType: 'json',
       type: 'POST',

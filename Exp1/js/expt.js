@@ -1,8 +1,19 @@
+function debugLog(message){
+  if(expt.debug){
+    console.log(message);
+  }
+}
+
 var exptPart = "practice";
 var trialNumber = 0;
 var trialData = [];
 var Trial = 36; //set by length(stim) //36
 var expt = {
+    name: 'FruityStudy',
+    maxTrials: 36,
+    debug: false,
+    rmse_threshold: 0.5,
+    rmse_match: 'color',
     saveURL: 'submit.simple.php',
 };
 var client = parseClient();
@@ -142,7 +153,8 @@ function trialDone(){
     // if we are done with all trials, then go to completed page
     if(trialNumber >= Trial){
         // these lines write to server
-        //console.log(trialData);
+        debugLog(trialData);
+        debugLog(client);
         data = {client: client, trials: trialData};
         writeServer(data);
         document.getElementById('trial').style.display = 'none';
