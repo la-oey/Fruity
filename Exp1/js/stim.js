@@ -14,18 +14,18 @@ var stim = [
 ]
 
 var stim2 = [
-	{produce:"peach", adj1:"cheap", adj2:"sweet"},
+	{produce:"peach", adj1:"cheap", adj2:"juicy"},
 	{produce:"mango", adj1:"expensive", adj2:"juicy"},
-	{produce:"grapefruit", adj1:"cheap", adj2:"tart"},
-	{produce:"pumpkin", adj1:"expensive", adj2:"bright"},
-	{produce:"pomegranate", adj1:"juicy", adj2:"fat"},
-	{produce:"pineapple", adj1:"dry", adj2:"light"},
-	{produce:"rhubarb", adj1:"long", adj2:"thin"},
-	{produce:"onion", adj1:"juicy", adj2:"dense"},
-	{produce:"cabbage", adj1:"dry", adj2:"big"},
-	{produce:"lime", adj1:"weak", adj2:"bright"},
-	{produce:"garlic", adj1:"strong", adj2:"fresh"},
-	{produce:"ginger", adj1:"fragrant", adj2:"flavorful"}
+	{produce:"grapefruit", adj1:"cheap", adj2:"dry"},
+	{produce:"pumpkin", adj1:"expensive", adj2:"dry"},
+	{produce:"lime", adj1:"cheap", adj2:"weak"},
+	{produce:"garlic", adj1:"expensive", adj2:"weak"},
+	{produce:"ginger", adj1:"cheap", adj2:"strong"},
+	{produce:"rhubarb", adj1:"expensive", adj2:"strong"},
+	{produce:"pomegranate", adj1:"juicy", adj2:"weak"},
+	{produce:"pineapple", adj1:"dry", adj2:"weak"},
+	{produce:"onion", adj1:"juicy", adj2:"strong"},
+	{produce:"cabbage", adj1:"dry", adj2:"strong"}
 ]
 
 var stimFill = [
