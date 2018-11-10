@@ -31,6 +31,8 @@ var trialStim = [];
 var startTime = 0;
 var trialTime = 0;
 
+var audio;
+
 
 function pageLoad(){
     document.getElementById('consent').style.display = 'block';
@@ -77,6 +79,8 @@ function trialStart(){
     $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
     $('.cell').css({'background-color':'white'});
 
+	intiateAudioPlay();
+	
     var sampledLists = []
     if(stimList.length > 0){
         sampledLists.push("stimList");
@@ -189,3 +193,9 @@ function sampleInd(min, max){
 }
 
 
+function intiateAudioPlay() {
+    audio = new Audio();
+	audio.src = "audio/Audio_001.wav";
+	audio.loop = false;
+	audio.play();
+}
