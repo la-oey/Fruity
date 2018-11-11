@@ -76,7 +76,7 @@ function trialStart(){
     $('#next').attr('disabled',true);
     $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
     $('.cell').css({'background-color':'white'});
-	
+
     var sampledLists = []
     if(stimList.length > 0){
         sampledLists.push("stimList");
@@ -90,12 +90,11 @@ function trialStart(){
 
     stimType = sample(sampledLists);
 
-	
     if(stimType == "stimList"){
         trialStim = stimList[0];
         structureIndex = structInd;
         sent = sentence(stimList, 0, structure[structInd]);
-        $('#stimTxt').htmlF(sent['txt']);   
+        $('#stimTxt').html(sent['txt']);   
         stimList.splice(0,1);
         if(structInd == (structure.length - 1)){
             structInd = 0;
@@ -196,8 +195,8 @@ function intiateAudioPlay(array) {
     var audio = new Audio();
 	if (array["produce"] == "tomato"){
 		audio.src = "audio/stimFill/tomato.wav";
-	} else if (array["produce"] == "grapefruit") {
-		audio.src = "audio/stimFill/grapefruit.wav";
+	} else if (array["produce"] == "round brussels sprout") {
+		audio.src = "audio/stimFill/round_brussels_sprout.wav";
 	} else if (array["produce"] == "black strawberry") {
 		audio.src = "audio/stimFill/black_strawberry.wav";
 	} else if (array["produce"] == "blood orange") {
