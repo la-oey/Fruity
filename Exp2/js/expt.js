@@ -31,8 +31,6 @@ var trialStim = [];
 var startTime = 0;
 var trialTime = 0;
 
-var audio;
-
 
 function pageLoad(){
     document.getElementById('consent').style.display = 'block';
@@ -78,8 +76,6 @@ function trialStart(){
     $('#next').attr('disabled',true);
     $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
     $('.cell').css({'background-color':'white'});
-
-	intiateAudioPlay();
 	
     var sampledLists = []
     if(stimList.length > 0){
@@ -94,11 +90,12 @@ function trialStart(){
 
     stimType = sample(sampledLists);
 
+	
     if(stimType == "stimList"){
         trialStim = stimList[0];
         structureIndex = structInd;
         sent = sentence(stimList, 0, structure[structInd]);
-        $('#stimTxt').html(sent['txt']);   
+        $('#stimTxt').htmlF(sent['txt']);   
         stimList.splice(0,1);
         if(structInd == (structure.length - 1)){
             structInd = 0;
@@ -124,6 +121,8 @@ function trialStart(){
         stimFillList.splice(0,1);
     }
 
+	intiateAudioPlay(trialStim);
+	
     boxOrder = shuffle([trialStim['adj1'], trialStim['adj2']]);   
     $('#txtL').html(boxOrder[0]);
     $('#txtR').html(boxOrder[1]);
@@ -193,9 +192,35 @@ function sampleInd(min, max){
 }
 
 
-function intiateAudioPlay() {
-    audio = new Audio();
-	audio.src = "audio/Audio_001.wav";
+function intiateAudioPlay(array) {
+    var audio = new Audio();
+	if (array["produce"] == "tomato"){
+		audio.src = "audio/stimFill/tomato.wav";
+	} else if (array["produce"] == "grapefruit") {
+		audio.src = "audio/stimFill/grapefruit.wav";
+	} else if (array["produce"] == "black strawberry") {
+		audio.src = "audio/stimFill/black_strawberry.wav";
+	} else if (array["produce"] == "blood orange") {
+		audio.src = "audio/stimFill/blood_orange.wav";
+	} else if (array["produce"] == "salty plantain") {
+		audio.src = "audio/stimFill/salty_plantain.wav";
+	} else if (array["produce"] == "bitter sweet okra") {
+		audio.src = "audio/stimFill/bitter_sweet_okra.wav";
+	} else if (array["produce"] == "bright summer squash") {
+		audio.src = "audio/stimFill/bright_summer_squash.wav";
+	} else if (array["produce"] == "blueberry") {
+		audio.src = "audio/stimFill/blueberry.wav";
+	} else if (array["produce"] == "spiky artichoke") {
+		audio.src = "audio/stimFill/spiky_artichoke.wav";
+	} else if (array["produce"] == "dark ripe avocado") {
+		audio.src = "audio/stimFill/dark_ripe_avocado.wav";
+	} else if (array["produce"] == "green grape") {
+		audio.src = "audio/stimFill/green_grape.wav";
+	} else if (array["produce"] == "sweet beet") {
+		audio.src = "audio/stimFill/sweet_beet.wav";
+	} else {
+		audio.src = "audio/search_first_to_find_it.wav";
+	}
 	audio.loop = false;
 	audio.play();
 }
