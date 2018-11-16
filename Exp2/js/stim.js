@@ -132,12 +132,12 @@ function insertAudio(array, index, adj1, adj2, order, prosody) {
 	audio.play();
 
 	audio.onended = function() {
-    if(i < playList.length){
-        audio.src= playList[i];
-        audio.play();
-        i++;
-    }
-};
+    	if(i < playList.length){
+			audio.src= playList[i];
+        	audio.play();
+        	i++;
+    	}
+	};
 }
 
 function insertFillerAudio(array, index) {
@@ -157,12 +157,12 @@ function insertFillerAudio(array, index) {
 	audio.play();
 
 	audio.onended = function() {
-    if(i < playList.length){
-        audio.src= playList[i];
-        audio.play();
-        i++;
-    }
-};
+    	if(i < playList.length){
+        	audio.src= playList[i];
+        	audio.play();
+        	i++;
+    	}
+	};
 	
 }
 
