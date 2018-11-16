@@ -122,11 +122,22 @@ function insertAudio(array, index, adj1, adj2, order, prosody) {
 	var adjFirst = adj1.charAt(0).toUpperCase() + adj1.slice(1);
 	var adjSecond = adj2.charAt(0).toUpperCase() + adj2.slice(1);
 	var audio = new Audio();
-
-	// assign audio directory
-	audio.src = "audio/Audio_" + stimType + "_" + ind + "_prod" + prod + "-adj1" + adjFirst + "-adj2" + adjSecond + "_order" + order.toString() + "_pros" + prosody.toString() + ".wav";
 	
+	// assign audio directory
+	var audioDir = "audio/Audio_" + stimType + "_" + ind + "_prod" + prod + "-adj1" + adjFirst + "-adj2" + adjSecond + "_order" + order.toString() + "_pros" + prosody.toString() + ".wav";
+	var playList = [audioDir, "audio/Audio_question.wav"];
+	
+	var i = 1;
+	audio.src = playList[0];
 	audio.play();
+
+	audio.onended = function() {
+    if(i < playList.length){
+        audio.src= playList[i];
+        audio.play();
+        i++;
+    }
+};
 }
 
 function insertFillerAudio(array, index) {
@@ -136,13 +147,23 @@ function insertFillerAudio(array, index) {
 	var adjFirst = array[index]["adj1"].charAt(0).toUpperCase() + array[index]["adj1"].slice(1);
 	var adjSecond = array[index]["adj2"].charAt(0).toUpperCase() + array[index]["adj2"].slice(1);
 	var audio = new Audio();
-	
+
 	// assign audio directory
-	audio.src = "audio/Audio_" + stimType + "_" + ind + "_prod" + prod + "-adj1" + adjFirst + "-adj2" + adjSecond + "_order0_pros0.wav";
+	var audioDir = "audio/Audio_" + stimType + "_" + ind + "_prod" + prod + "-adj1" + adjFirst + "-adj2" + adjSecond + "_order0_pros0.wav";
+	var playList = [audioDir, "audio/Audio_question.wav"];
 	
-	// audio.src = "audio/Audio_stimFill_02_prodBlackStrawberry-adj1Cold-adj2Hot_order0_pros0.wav";
-	
+	var i = 1;
+	audio.src = playList[0];
 	audio.play();
+
+	audio.onended = function() {
+    if(i < playList.length){
+        audio.src= playList[i];
+        audio.play();
+        i++;
+    }
+};
+	
 }
 
 function capWordsInitialLetter(string) {
