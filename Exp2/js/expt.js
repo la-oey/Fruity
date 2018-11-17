@@ -7,10 +7,10 @@ function debugLog(message){
 var exptPart = "practice";
 var trialNumber = 0;
 var trialData = [];
-var Trial = 36; //set by length(stim) //36
+var Trial = 108; //set by length(stim) //108
 var expt = {
     name: 'FruityStudy',
-    maxTrials: 36,
+    maxTrials: 108,
     debug: false,
     rmse_threshold: 0.5,
     rmse_match: 'color',
@@ -30,6 +30,8 @@ var stimType = "";
 var trialStim = [];
 var startTime = 0;
 var trialTime = 0;
+var countStim = 0;
+var countStim2 = 0;
 
 
 function pageLoad(){
@@ -80,10 +82,20 @@ function trialStart(){
     var sampledLists = []
     if(stimList.length > 0){
         sampledLists.push("stimList");
-    }
+    } else {
+		if (countStim < 4) {
+			stimList = shuffle(stim.slice(0));
+			sampledLists.push("stimList");
+		}
+	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
-    }
+    } else {
+		if (countStim2 < 4) {
+			stimList2 = shuffle(stim2.slice(0));
+			sampledLists.push("stimList2");
+		}
+	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
     }
