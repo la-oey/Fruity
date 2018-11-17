@@ -17,6 +17,8 @@ var expt = {
     saveURL: 'submit.simple.php',
 };
 var client = parseClient();
+var stimFinal = [];
+var stimFinal2 = [];
 var stimList = [];
 var stimList2 = [];
 var countStim = 0;
@@ -53,8 +55,10 @@ function clickConsent(){
 
 function clickInstructions(){
     document.getElementById('instructions').style.display = 'none';
-    stimList = shuffle(stim.slice(0));
-    stimList2 = shuffle(stim2.slice(0));
+    window.stimFinal = shuffle(stim.slice(0));
+	stimList = window.stimFinal;
+    window.stimFinal2 = shuffle(stim2.slice(0));
+	stimList2 = window.stimFinal2;
     stimFillList = shuffle(stimFill.slice(0));
     trialStart();
 }
@@ -83,21 +87,17 @@ function trialStart(){
     var sampledLists = []
     if(stimList.length > 0){
         sampledLists.push("stimList");
-    } else {
-		if (countStim < 4) {
-			stimList = shuffle(stim.slice(0));
+    } else if (countStim < 4) {
+			stimList = window.stimFinal;
 			sampledLists.push("stimList");
 			++structInd;
-		}
 	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
-    } else {
-		if (countStim2 < 4) {
-			stimList2 = shuffle(stim2.slice(0));
+    } else if (countStim2 < 4) {
+			stimList2 = window.stimFinal2;
 			sampledLists.push("stimList2");
 			++structInd2;
-		}
 	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
