@@ -18,6 +18,9 @@ var expt = {
 };
 var client = parseClient();
 var stimList = [];
+var stimList2 = [];
+var countStim = 0;
+var countStim2 = 0;
 var selectedBox = "";
 var selectedTxt = "";
 var boxOrder = [];
@@ -30,8 +33,6 @@ var stimType = "";
 var trialStim = [];
 var startTime = 0;
 var trialTime = 0;
-var countStim = 0;
-var countStim2 = 0;
 
 
 function pageLoad(){
@@ -86,6 +87,7 @@ function trialStart(){
 		if (countStim < 4) {
 			stimList = shuffle(stim.slice(0));
 			sampledLists.push("stimList");
+			++structInd;
 		}
 	}
     if(stimList2.length > 0){
@@ -94,6 +96,7 @@ function trialStart(){
 		if (countStim2 < 4) {
 			stimList2 = shuffle(stim2.slice(0));
 			sampledLists.push("stimList2");
+			++structInd2;
 		}
 	}
     if(stimFillList.length > 0){
