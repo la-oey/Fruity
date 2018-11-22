@@ -55,10 +55,10 @@ function clickConsent(){
 
 function clickInstructions(){
     document.getElementById('instructions').style.display = 'none';
-    window.stimFinal = shuffle(stim.slice(0));
-	stimList = window.stimFinal;
-    window.stimFinal2 = shuffle(stim2.slice(0));
-	stimList2 = window.stimFinal2;
+    stimList = assign1(stim.slice(0));
+	// stimFinal = stimList;
+    stimList2 = assign2(stim2.slice(0));
+	// stimFinal2 = stimList2;
     stimFillList = shuffle(stimFill.slice(0));
     trialStart();
 }
@@ -88,16 +88,16 @@ function trialStart(){
     if(stimList.length > 0){
         sampledLists.push("stimList");
     } else if (countStim < 4) {
-			stimList = window.stimFinal;
-			sampledLists.push("stimList");
-			++structInd;
+		stimList = stimFinal;
+		sampledLists.push("stimList");
+		++structInd;
 	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
     } else if (countStim2 < 4) {
-			stimList2 = window.stimFinal2;
-			sampledLists.push("stimList2");
-			++structInd2;
+		stimList2 = stimFinal2;
+		sampledLists.push("stimList2");
+		++structInd2;
 	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
@@ -148,7 +148,7 @@ function trialDone(){
 
     // record what the subject said
     trialData.push({
-        trialNumber: trialNumber, //{0:36}
+        trialNumber: trialNumber, //{0:108}
         stimType: stimType, //{stimList, stimList2, stimFillList}
         structureIndex: structure[structureIndex], //{a, b, c, d}
         produce: trialStim['produce'],
@@ -186,14 +186,25 @@ function experimentDone(){
 
 
 function shuffle(array){
-  var tornado = array.slice(0);
-  var return_array = [];
-  for(var i=0; i<array.length; i++){
-    var randomIndex = Math.floor(Math.random()*tornado.length);
-    return_array.push(tornado.splice(randomIndex, 1)[0]);
-  }
-  return return_array;   
+ 	var tornado = array.slice(0);
+  	var return_array = [];
+  	for(var i=0; i<array.length; i++){
+		var randomIndex = Math.floor(Math.random()*tornado.length);
+    	return_array.push(tornado.splice(randomIndex, 1)[0]);
+	}
+  	return return_array;   
 }
+
+function assign1(array){
+	stimFinal = shuffle(array);
+	return stimFinal;
+}
+
+function assign2(array){
+	stimFinal2 = shuffle(array);
+	return stimFinal2;
+}
+	
 
 function sample(array){
     return(array[Math.floor(Math.random() * array.length)]);
