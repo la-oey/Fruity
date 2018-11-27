@@ -87,17 +87,21 @@ function trialStart(){
     var sampledLists = []
     if(stimList.length > 0){
         sampledLists.push("stimList");
-    } else if (countStim < 4) {
+    } 
+	if (countStim < 4) {
 		stimList = stimFinal;
 		sampledLists.push("stimList");
 		++structInd;
+		++countStim;
 	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
-    } else if (countStim2 < 4) {
+    } 
+	if (countStim2 < 4) {
 		stimList2 = stimFinal2;
 		sampledLists.push("stimList2");
 		++structInd2;
+		++countStim2;
 	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
