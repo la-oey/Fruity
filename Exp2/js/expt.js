@@ -55,10 +55,10 @@ function clickConsent(){
 
 function clickInstructions(){
     document.getElementById('instructions').style.display = 'none';
-    stimList = assign1(stim.slice(0));
-	// stimFinal = stimList;
-    stimList2 = assign2(stim2.slice(0));
-	// stimFinal2 = stimList2;
+    stimList = shuffle(stim.slice(0));
+	stimFinal = stimList.slice(0);
+    stimList2 = shuffle(stim2.slice(0));
+	stimFinal2 = stimList2.slice(0);
     stimFillList = shuffle(stimFill.slice(0));
     trialStart();
 }
@@ -84,24 +84,30 @@ function trialStart(){
     $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
     $('.cell').css({'background-color':'white'});
 
-    var sampledLists = []
+    var sampledLists = [];
     if(stimList.length > 0){
         sampledLists.push("stimList");
-    } 
-	if (countStim < 4) {
-		stimList = stimFinal;
+    } else if (countStim < 4) {
+		stimList = stimFinal.slice(0);
 		sampledLists.push("stimList");
-		++structInd;
 		++countStim;
+		if(structInd == (structure.length - 1)){
+			structInd = 0;
+		} else {
+			++structInd;
+		}
 	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
-    } 
-	if (countStim2 < 4) {
-		stimList2 = stimFinal2;
+    } else if (countStim2 < 4) {
+		stimList2 = stimFinal2.slice(0);
 		sampledLists.push("stimList2");
-		++structInd2;
 		++countStim2;
+		if(structInd2 == (structure.length - 1)){
+			structInd2 = 0;
+		} else {
+			++structInd2;
+		}
 	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
@@ -198,17 +204,6 @@ function shuffle(array){
 	}
   	return return_array;   
 }
-
-function assign1(array){
-	stimFinal = shuffle(array);
-	return stimFinal;
-}
-
-function assign2(array){
-	stimFinal2 = shuffle(array);
-	return stimFinal2;
-}
-	
 
 function sample(array){
     return(array[Math.floor(Math.random() * array.length)]);
