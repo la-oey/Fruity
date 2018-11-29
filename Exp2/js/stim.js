@@ -115,6 +115,16 @@ function fillerSent(array, index) {
 	return {'txt': det + " " + noun, 'adjFirst': 'NA', 'adjSecond': 'NA'};
 }
 
+function getDuration(src) {
+    return new Promise(function(resolve) {
+        var audio = new Audio();
+        $(audio).on("loadedmetadata", function(){
+            resolve(audio.duration);
+        });
+        audio.src = src;
+    });
+}
+
 function insertAudio(array, index, adj1, adj2, order, prosody) {
 	var stimType = array[index]["list"];
 	var ind = array[index]["origiIndex"];
@@ -134,8 +144,10 @@ function insertAudio(array, index, adj1, adj2, order, prosody) {
 	audio.onended = function() {
     	if(i < playList.length){
 			audio.src= playList[i];
-        	audio.play();
+			audio.play();
         	i++;
+    	} else{
+    		$('.cell').css({'background-color':'white', 'pointer-events':'auto'});
     	}
 	};
 }
@@ -161,6 +173,8 @@ function insertFillerAudio(array, index) {
         	audio.src= playList[i];
         	audio.play();
         	i++;
+    	} else{
+    		$('.cell').css({'background-color':'white', 'pointer-events':'auto'});
     	}
 	};
 	

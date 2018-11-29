@@ -82,7 +82,7 @@ function trialStart(){
     document.getElementById('trial').style.display = 'block';
     $('#next').attr('disabled',true);
     $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
-    $('.cell').css({'background-color':'white'});
+    $('.cell').css({'background-color':'gray', 'pointer-events':'none'});
 
     var sampledLists = [];
     if(stimList.length > 0){
