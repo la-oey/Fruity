@@ -4,43 +4,38 @@ function debugLog(message){
   }
 }
 
+var exptPart = "practice";
+var trialNumber = 0;
 var trialData = [];
+var Trial = 144; //set by length(stim) //144
 var expt = {
     name: 'FruityStudy',
-    maxTrials: 108,
-    maxBlocks: 4,
-    structure: ["a","b","c","d"],
+    maxTrials: 144,
     debug: false,
     rmse_threshold: 0.5,
     rmse_match: 'color',
     saveURL: 'submit.simple.php',
 };
-
-var trial = {
-    block: 0,
-    trialNumber: 0,
-    stimType: "",
-    structureIndex: 0,
-    sent: "",
-    boxOrder: [],
-    selectedBox: "",
-    selectedTxt: "",
-    startTime: 0,
-    trialTime: 0
-};
-
 var client = parseClient();
 var stimFinal = [];
 var stimFinal2 = [];
 var stimList = [];
 var stimList2 = [];
-var stimFillList = []
 var countStim = 0;
 var countStim2 = 0;
-var structInd = sampleInd(0,expt.structure.length - 1); //replace with set list?
-var structInd2 = sampleInd(0,expt.structure.length - 1);
+var countStimFill = 0;
+var selectedBox = "";
+var selectedTxt = "";
+var boxOrder = [];
+var sent = "";
+var structureIndex = 0;
+var structure = ["a","b","c","d"];
+var structInd = sampleInd(0,structure.length - 1); //replace with set list?
+var structInd2 = sampleInd(0,structure.length - 1);
+var stimType = "";
 var trialStim = [];
-
+var startTime = 0;
+var trialTime = 0;
 
 
 function pageLoad(){
@@ -52,7 +47,6 @@ function pageLoad(){
                 $('#continueConsent').attr('disabled',false);
             }
         });
-    $('#maxTrials').html(expt.maxTrials);
 }
 
 function clickConsent(){
@@ -73,13 +67,13 @@ function clickInstructions(){
 function select(cell){
     $('#next').attr('disabled',false);
     if(cell == cellL){
-        trial.selectedBox = "left";
-        trial.selectedTxt = trial.boxOrder[0];
+        selectedBox = "left";
+        selectedTxt = boxOrder[0];
         $('#cellR').css({'background-color':'white'}); //if cellR previously clicked, unhighlights it
         $('#cellL').css({'background-color':'yellow'});
     } else{
-        trial.selectedBox = "right";
-        trial.selectedTxt = trial.boxOrder[1];
+        selectedBox = "right";
+        selectedTxt = boxOrder[1];
         $('#cellL').css({'background-color':'white'}); //if cellL previously clicked, unhighlights it
         $('#cellR').css({'background-color':'yellow'});
     }
@@ -88,17 +82,17 @@ function select(cell){
 function trialStart(){
     document.getElementById('trial').style.display = 'block';
     $('#next').attr('disabled',true);
-    $('#round').html('Round ' + (trial.trialNumber + 1) + " of " + expt.maxTrials);
-    $('.cell').css({'background-color':'gray', 'pointer-events':'none'});
+    $('#round').html('Round ' + (trialNumber + 1) + " of " + Trial);
+    $('.cell').css({'background-color':'white'});
 
     var sampledLists = [];
     if(stimList.length > 0){
         sampledLists.push("stimList");
-    } else if (countStim < expt.maxBlocks) {
+    } else if (countStim < 4) {
 		stimList = stimFinal.slice(0);
 		sampledLists.push("stimList");
 		++countStim;
-		if(structInd == (expt.structure.length - 1)){
+		if(structInd == (structure.length - 1)){
 			structInd = 0;
 		} else {
 			++structInd;
@@ -106,11 +100,11 @@ function trialStart(){
 	}
     if(stimList2.length > 0){
         sampledLists.push("stimList2");
-    } else if (countStim2 < expt.maxBlocks) {
+    } else if (countStim2 < 4) {
 		stimList2 = stimFinal2.slice(0);
 		sampledLists.push("stimList2");
 		++countStim2;
-		if(structInd2 == (expt.structure.length - 1)){
+		if(structInd2 == (structure.length - 1)){
 			structInd2 = 0;
 		} else {
 			++structInd2;
@@ -118,72 +112,76 @@ function trialStart(){
 	}
     if(stimFillList.length > 0){
         sampledLists.push("stimFillList");
-    }
+    } else if (countStimFill < 4) {
+		stimFillList = shuffle(stimFill.slice(0));
+		sampledLists.push("stimFillList");
+		++countStimFill;
+	}
 
-    trial.stimType = sample(sampledLists);
+    stimType = sample(sampledLists);
 
-    if(trial.stimType == "stimList"){
+    if(stimType == "stimList"){
         trialStim = stimList[0];
-        trial.structureIndex = structInd;
-        trial.sent = sentence(stimList, 0, expt.structure[trial.structureIndex]);
-        $('#stimTxt').html(trial.sent['txt']);   
+        structureIndex = structInd;
+        sent = sentence(stimList, 0, structure[structInd]);
+        $('#stimTxt').html(sent['txt']);   
         stimList.splice(0,1);
-        if(structInd == (expt.structure.length - 1)){
+        if(structInd == (structure.length - 1)){
             structInd = 0;
         } else{
             ++structInd;
         }
-    } else if(trial.stimType == "stimList2"){
+    } else if(stimType == "stimList2"){
         trialStim = stimList2[0];
-        trial.structureIndex = structInd2;
-        trial.sent = sentence(stimList2, 0, expt.structure[trial.structureIndex]);
-        $('#stimTxt').html(trial.sent['txt']);
+        structureIndex = structInd2;
+        sent = sentence(stimList2, 0, structure[structInd2]);
+        $('#stimTxt').html(sent['txt']);
         stimList2.splice(0,1);
-        if(structInd2 == (expt.structure.length - 1)){
+        if(structInd2 == (structure.length - 1)){
             structInd2 = 0;
         } else{
             ++structInd2;
         }
     } else{
         trialStim = stimFillList[0];
-        trial.structureIndex = 0;
-        trial.sent = fillerSent(stimFillList, 0);
-        $('#stimTxt').html(trial.sent['txt']);
+        structureIndex = 0;
+        sent = fillerSent(stimFillList, 0);
+        $('#stimTxt').html(sent['txt']);
         stimFillList.splice(0,1);
     }
 	
-    trial.boxOrder = shuffle([trialStim['adj1'], trialStim['adj2']]);   
-    $('#txtL').html(trial.boxOrder[0]);
-    $('#txtR').html(trial.boxOrder[1]);
+    boxOrder = shuffle([trialStim['adj1'], trialStim['adj2']]);   
+    $('#txtL').html(boxOrder[0]);
+    $('#txtR').html(boxOrder[1]);
 
-    trial.startTime = new Date().getTime();
+    startTime = new Date().getTime();
 }
 
 function trialDone(){
     document.getElementById('trial').style.display = 'none';
-    trial.trialTime = new Date().getTime() - trial.startTime;
+    trialTime = new Date().getTime() - startTime;
 
     // record what the subject said
     trialData.push({
-        trialNumber: trial.trialNumber, //{0:108}
-        stimType: trial.stimType, //{stimList, stimList2, stimFillList}
-        structureIndex: expt.structure[trial.structureIndex], //{a, b, c, d}
+        trialNumber: trialNumber, //{0:108}
+        stimType: stimType, //{stimList, stimList2, stimFillList}
+        structureIndex: structure[structureIndex], //{a, b, c, d}
         produce: trialStim['produce'],
-        adjFirst: trial.sent['adjFirst'], //1st adj in sentence
-        adjSecond: trial.sent['adjSecond'], //2nd adj in sentence
-        nounPhrase: trial.sent['txt'],
+        adjFirst: sent['adjFirst'], //1st adj in sentence
+        adjSecond: sent['adjSecond'], //2nd adj in sentence
+        nounPhrase: sent['txt'],
         fullSentence: $('#sentence').text(),
-        boxLeft: trial.boxOrder[0],
-        boxRight: trial.boxOrder[1],
-        selectedBox: trial.selectedBox,
-        selectedTxt: trial.selectedTxt,
-        trialTime: trial.trialTime
+        boxLeft: boxOrder[0],
+        boxRight: boxOrder[1],
+        selectedBox: selectedBox,
+        selectedTxt: selectedTxt,
+        trialTime: trialTime
     });
     // increment the trialNumber
-    ++trial.trialNumber;
+    ++trialNumber;
     
     // if we are done with all trials, then go to completed page
-    if(trial.trialNumber >= expt.maxTrials){
+    if(trialNumber >= Trial){
         // these lines write to server
         debugLog(trialData);
         debugLog(client);
