@@ -43,7 +43,7 @@ var stimFill = [
 	{produce:"bitter sweet okra", adj1:"bitter", adj2:"purple", origiIndex:"11", list:"stimFill"}
 ]
 
-function sentence(array, index, struct) {
+function sentence(dict, struct) {
 	// order1 = adj1 appears first
 	// order2 = adj2 appears first
 	// pros1 = first adjective is emphasized
@@ -56,20 +56,20 @@ function sentence(array, index, struct) {
 	var txt = "";
 	var adj1 = "";
 	var adj2 = "";
-	var adjFirst = array[index]["adj1"];
-	var adjSecond = array[index]["adj2"];
-	var noun = array[index]["produce"];
+	var adjFirst = dict["adj1"];
+	var adjSecond = dict["adj2"];
+	var noun = dict["produce"];
 	var detAdj1 = "a";
 	var order = 0;
 	var pros = 0;
 	
 	// assign sequence of adj
 	if(struct == "a" || struct == "b"){
-		adj1 = array[index]["adj1"];
-		adj2 = array[index]["adj2"];
+		adj1 = dict["adj1"];
+		adj2 = dict["adj2"];
 	} else{
-		adj1 = array[index]["adj2"];
-		adj2 = array[index]["adj1"];
+		adj1 = dict["adj2"];
+		adj2 = dict["adj1"];
 	}
 	
 	// change determinant
@@ -96,21 +96,21 @@ function sentence(array, index, struct) {
 	txt = detAdj1 + " " + adj1 + " " + adj2 + " " + noun;
 	
 	// play audio
-	insertAudio(array, index, adjFirst, adjSecond, order, pros);
+	insertAudio(dict, adjFirst, adjSecond, order, pros);
 	
 	return {'txt': txt, 'adjFirst': adj1, 'adjSecond': adj2};
 }
 
-function fillerSent(array, index) {
+function fillerSent(dict) {
 	var vowels = ['a','e','i','o','u'];
-	var noun = array[index]["produce"];
+	var noun = dict["produce"];
 	var det = "a";
 	if(vowels.indexOf(noun[0]) != -1){
 		det = "an";
 	}
 	
 	// play audio
-	insertFillerAudio(array, index);
+	insertFillerAudio(dict);
 	
 	return {'txt': det + " " + noun, 'adjFirst': 'NA', 'adjSecond': 'NA'};
 }
@@ -125,10 +125,10 @@ function getDuration(src) {
     });
 }
 
-function insertAudio(array, index, adj1, adj2, order, prosody) {
-	var stimType = array[index]["list"];
-	var ind = array[index]["origiIndex"];
-	var prod = array[index]["produce"].charAt(0).toUpperCase() + array[index]["produce"].slice(1);
+function insertAudio(dict, adj1, adj2, order, prosody) {
+	var stimType = dict["list"];
+	var ind = dict["origiIndex"];
+	var prod = dict["produce"].charAt(0).toUpperCase() + dict["produce"].slice(1);
 	var adjFirst = adj1.charAt(0).toUpperCase() + adj1.slice(1);
 	var adjSecond = adj2.charAt(0).toUpperCase() + adj2.slice(1);
 	var audio = new Audio();
@@ -152,12 +152,12 @@ function insertAudio(array, index, adj1, adj2, order, prosody) {
 	};
 }
 
-function insertFillerAudio(array, index) {
-	var stimType = array[index]["list"];
-	var ind = array[index]["origiIndex"];
-	var prod = capWordsInitialLetter(array[index]["produce"]);
-	var adjFirst = array[index]["adj1"].charAt(0).toUpperCase() + array[index]["adj1"].slice(1);
-	var adjSecond = array[index]["adj2"].charAt(0).toUpperCase() + array[index]["adj2"].slice(1);
+function insertFillerAudio(dict) {
+	var stimType = dict["list"];
+	var ind = dict["origiIndex"];
+	var prod = capWordsInitialLetter(dict["produce"]);
+	var adjFirst = dict["adj1"].charAt(0).toUpperCase() + dict["adj1"].slice(1);
+	var adjSecond = dict["adj2"].charAt(0).toUpperCase() + dict["adj2"].slice(1);
 	var audio = new Audio();
 
 	// assign audio directory

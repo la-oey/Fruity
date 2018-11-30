@@ -192,7 +192,9 @@ td {
     font-size: 36px;
 }
 
-
+#sentence {
+    opacity: 0;
+}
 
 
 

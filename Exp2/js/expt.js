@@ -9,6 +9,7 @@ var expt = {
     name: 'FruityStudy',
     maxTrials: 144,
     maxBlocks: 4,
+    numTrialsBlock: 36,
     structure: ["a","b","c","d"],
     debug: false,
     rmse_threshold: 0.5,
@@ -19,8 +20,8 @@ var expt = {
 var trial = {
     block: 0,
     trialNumber: 0,
-    stimType: "",
-    structureIndex: 0,
+    trialWithinBlock: 0,
+    trialDict: [],
     sent: "",
     boxOrder: [],
     selectedBox: "",
@@ -28,6 +29,15 @@ var trial = {
     startTime: 0,
     trialTime: 0
 };
+
+
+var setup = {
+    stimList: [],
+    trialStim: [],
+    stimType: "",
+    structureIndex: 0,
+    sentence: []
+}
 
 var client = parseClient();
 var stimFinal = [];
@@ -40,7 +50,6 @@ var countStim2 = 0;
 var countStimFill = 0;
 var structInd = sampleInd(0,expt.structure.length - 1); //replace with set list?
 var structInd2 = sampleInd(0,expt.structure.length - 1);
-var trialStim = [];
 
 
 
@@ -68,6 +77,70 @@ function clickInstructions(){
     stimList2 = shuffle(stim2.slice(0));
 	stimFinal2 = stimList2.slice(0);
     stimFillList = shuffle(stimFill.slice(0));
+    stimFinalFill = stimList2.slice(0);
+    blockStimList = [];
+    exptFullList = [];
+
+    //create list for block here
+    for(var i=0; i<stimFinal.length+stimFinal2.length+stimFinalFill.length; i++){
+        var sampledLists = [];
+        if(stimList.length > 0){
+            sampledLists.push("stimList");
+        }
+        if(stimList2.length > 0){
+            sampledLists.push("stimList2");
+        }
+        if(stimFillList.length > 0){
+            sampledLists.push("stimFillList");
+        }
+        setup.stimType = sample(sampledLists);
+
+        if(setup.stimType == "stimList"){
+            setup.trialStim = stimList.slice(0);
+            setup.structureIndex = structInd;
+            stimList.splice(0,1);
+            if(structInd == (expt.structure.length - 1)){
+                structInd = 0;
+            } else{
+                ++structInd;
+            }
+            
+        } else if(setup.stimType == "stimList2"){
+            setup.trialStim = stimList2.slice(0);
+            setup.structureIndex = structInd2;
+            stimList2.splice(0,1);
+            if(structInd2 == (expt.structure.length - 1)){
+                structInd2 = 0;
+            } else{
+                ++structInd2;
+            }
+        } else{
+            setup.trialStim = stimFillList.slice(0);
+            setup.structureIndex = 0;
+            stimFillList.splice(0,1);
+        }
+        blockStimList.push({'list':setup.stimType, 'structureIndex':setup.structureIndex, 'trialStim':setup.trialStim[0]});
+    }
+    exptFullList.push(blockStimList);
+
+    var tempBlockStimList = blockStimList.slice(0);
+    for(var r=0; r<(expt.maxBlocks-1); r++){
+        var newBlockStimList = []
+        for(var s=0; s<tempBlockStimList.length; s++){
+            var tempStructureIndex = 0;
+            if(tempBlockStimList[s]['list'] != 'stimFillList'){
+                if(tempBlockStimList[s]['structureIndex'] == (expt.structure.length - 1)){
+                    tempStructureIndex = 0;
+                } else{
+                    tempStructureIndex = tempBlockStimList[s]['structureIndex'] + 1;
+                }
+            }
+            newBlockStimList.push({'list':tempBlockStimList[s]['list'], 'structureIndex':tempStructureIndex, 'trialStim':tempBlockStimList[s]['trialStim']});
+        }
+        tempBlockStimList = newBlockStimList.slice(0);
+        exptFullList.push(newBlockStimList);
+    }
+
     trialStart();
 }
 
@@ -92,72 +165,17 @@ function trialStart(){
     $('#round').html('Round ' + (trial.trialNumber + 1) + " of " + expt.maxTrials);
     $('.cell').css({'background-color':'gray', 'pointer-events':'none'});
 
-    var sampledLists = [];
-    if(stimList.length > 0){
-        sampledLists.push("stimList");
-    } else if (countStim < expt.maxBlocks) {
-		stimList = stimFinal.slice(0);
-		sampledLists.push("stimList");
-		++countStim;
-		if(structInd == (expt.structure.length - 1)){
-			structInd = 0;
-		} else {
-			++structInd;
-		}
-	}
-    if(stimList2.length > 0){
-        sampledLists.push("stimList2");
-    } else if (countStim2 < expt.maxBlocks) {
-		stimList2 = stimFinal2.slice(0);
-		sampledLists.push("stimList2");
-		++countStim2;
-		if(structInd2 == (expt.structure.length - 1)){
-			structInd2 = 0;
-		} else {
-			++structInd2;
-		}
-	}
-    if(stimFillList.length > 0){
-        sampledLists.push("stimFillList");
-    } else if (countStimFill < expt.maxBlocks) {
-		stimFillList = shuffle(stimFill.slice(0));
-		sampledLists.push("stimFillList");
-		++countStimFill;
-	}
+    trial.trialDict = exptFullList[trial.block][trial.trialWithinBlock];
 
-    trial.stimType = sample(sampledLists);
-
-    if(trial.stimType == "stimList"){
-        trialStim = stimList[0];
-        trial.structureIndex = structInd;
-        trial.sent = sentence(stimList, 0, expt.structure[trial.structureIndex]);
-        $('#stimTxt').html(trial.sent['txt']);   
-        stimList.splice(0,1);
-        if(structInd == (expt.structure.length - 1)){
-            structInd = 0;
-        } else{
-            ++structInd;
-        }
-    } else if(trial.stimType == "stimList2"){
-        trialStim = stimList2[0];
-        trial.structureIndex = structInd2;
-        trial.sent = sentence(stimList2, 0, expt.structure[trial.structureIndex]);
-        $('#stimTxt').html(trial.sent['txt']);
-        stimList2.splice(0,1);
-        if(structInd2 == (expt.structure.length - 1)){
-            structInd2 = 0;
-        } else{
-            ++structInd2;
-        }
+    if(trial.trialDict['list'] == 'stimFillList'){
+        trial.sent = fillerSent(trial.trialDict['trialStim']);
     } else{
-        trialStim = stimFillList[0];
-        trial.structureIndex = 0;
-        trial.sent = fillerSent(stimFillList, 0);
-        $('#stimTxt').html(trial.sent['txt']);
-        stimFillList.splice(0,1);
+        trial.sent = sentence(trial.trialDict['trialStim'],expt.structure[trial.trialDict['structureIndex']]);
     }
+    
+    $('#stimTxt').html(trial.sent['txt']); 
 	
-    trial.boxOrder = shuffle([trialStim['adj1'], trialStim['adj2']]);   
+    trial.boxOrder = shuffle([trial.trialDict['trialStim']['adj1'], trial.trialDict['trialStim']['adj2']]);   
     $('#txtL').html(trial.boxOrder[0]);
     $('#txtR').html(trial.boxOrder[1]);
 
@@ -172,8 +190,8 @@ function trialDone(){
     trialData.push({
         trialNumber: trial.trialNumber, //{0:108}
         stimType: trial.stimType, //{stimList, stimList2, stimFillList}
-        structureIndex: expt.structure[trial.structureIndex], //{a, b, c, d}
-        produce: trialStim['produce'],
+        structureIndex: expt.structure[trial.trialDict['structureIndex']], //{a, b, c, d}
+        produce: trial.trialDict['trialStim']['produce'],
         adjFirst: trial.sent['adjFirst'], //1st adj in sentence
         adjSecond: trial.sent['adjSecond'], //2nd adj in sentence
         nounPhrase: trial.sent['txt'],
@@ -186,6 +204,11 @@ function trialDone(){
     });
     // increment the trialNumber
     ++trial.trialNumber;
+    ++trial.trialWithinBlock;
+    if(trial.trialNumber % expt.numTrialsBlock == 0){
+        trial.trialWithinBlock = 0;
+        ++trial.block;
+    }
     
     // if we are done with all trials, then go to completed page
     if(trial.trialNumber >= expt.maxTrials){
