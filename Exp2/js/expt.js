@@ -23,10 +23,15 @@ var trial = {
     trialWithinBlock: 0,
     trialDict: [],
     sent: "",
+    order: 0,
+    prosody: 0,
+    audio: "",
     boxOrder: [],
     selectedBox: "",
     selectedTxt: "",
     startTime: 0,
+    audioEndTime: 0,
+    responseTime: 0,
     trialTime: 0
 };
 
@@ -172,6 +177,9 @@ function trialStart(){
     } else{
         trial.sent = sentence(trial.trialDict['trialStim'],expt.structure[trial.trialDict['structureIndex']]);
     }
+    trial.order = trial.sent['order'];
+    trial.prosody = trial.sent['prosody'];
+    trial.audio = trial.sent['audio'];
     
     $('#stimTxt').html(trial.sent['txt']); 
 	
@@ -184,22 +192,29 @@ function trialStart(){
 
 function trialDone(){
     document.getElementById('trial').style.display = 'none';
+    trial.responseTime = new Date().getTime() - trial.audioEndTime;
     trial.trialTime = new Date().getTime() - trial.startTime;
 
     // record what the subject said
     trialData.push({
-        trialNumber: trial.trialNumber, //{0:108}
-        stimType: trial.stimType, //{stimList, stimList2, stimFillList}
+        trialNumber: trial.trialNumber, //{0:143}
+        blockNumber: trial.block, //{0:3}
+        trialInBlock: trial.trialWithinBlock, //{0:35}
+        stimType: trial.trialDict['list'], //{stimList, stimList2, stimFillList}
         structureIndex: expt.structure[trial.trialDict['structureIndex']], //{a, b, c, d}
         produce: trial.trialDict['trialStim']['produce'],
         adjFirst: trial.sent['adjFirst'], //1st adj in sentence
         adjSecond: trial.sent['adjSecond'], //2nd adj in sentence
         nounPhrase: trial.sent['txt'],
         fullSentence: $('#sentence').text(),
+        order: trial.order,
+        prosody: trial.prosody,
+        audio: trial.audio,
         boxLeft: trial.boxOrder[0],
         boxRight: trial.boxOrder[1],
         selectedBox: trial.selectedBox,
         selectedTxt: trial.selectedTxt,
+        responseTime: trial.responseTime,
         trialTime: trial.trialTime
     });
     // increment the trialNumber

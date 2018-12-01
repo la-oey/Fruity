@@ -96,9 +96,9 @@ function sentence(dict, struct) {
 	txt = detAdj1 + " " + adj1 + " " + adj2 + " " + noun;
 	
 	// play audio
-	insertAudio(dict, adjFirst, adjSecond, order, pros);
+	var aud = insertAudio(dict, adjFirst, adjSecond, order, pros);
 	
-	return {'txt': txt, 'adjFirst': adj1, 'adjSecond': adj2};
+	return {'txt': txt, 'adjFirst': adj1, 'adjSecond': adj2, 'order': order, 'prosody': pros, 'audio': aud};
 }
 
 function fillerSent(dict) {
@@ -110,9 +110,9 @@ function fillerSent(dict) {
 	}
 	
 	// play audio
-	insertFillerAudio(dict);
+	var aud = insertFillerAudio(dict);
 	
-	return {'txt': det + " " + noun, 'adjFirst': 'NA', 'adjSecond': 'NA'};
+	return {'txt': det + " " + noun, 'adjFirst': 'NA', 'adjSecond': 'NA', 'order': 0, 'prosody': 0, 'audio': aud};
 }
 
 function getDuration(src) {
@@ -148,8 +148,11 @@ function insertAudio(dict, adj1, adj2, order, prosody) {
         	i++;
     	} else{
     		$('.cell').css({'background-color':'white', 'pointer-events':'auto'});
+    		trial.audioEndTime = new Date().getTime();
     	}
 	};
+
+	return audioDir;
 }
 
 function insertFillerAudio(dict) {
@@ -175,9 +178,11 @@ function insertFillerAudio(dict) {
         	i++;
     	} else{
     		$('.cell').css({'background-color':'white', 'pointer-events':'auto'});
+    		trial.audioEndTime = new Date().getTime();
     	}
 	};
 	
+	return audioDir;
 }
 
 function capWordsInitialLetter(string) {
