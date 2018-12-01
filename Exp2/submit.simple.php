@@ -22,7 +22,7 @@ function ajax_return($contents){
 
 	$data = json_decode($_REQUEST['data'], true);
 
-	$rawfile = sprintf('%s/%s.json', '../www-data/FruityStudy2', $data['client']['sid']);
+	$rawfile = sprintf('%s/%s.json', '../www-data/FruityStudy', $data['client']['sid']);
 	$fp = fopen($rawfile, 'w');
 	fwrite($fp, json_encode($data, JSON_PRETTY_PRINT));
 	fclose($fp);

@@ -15,6 +15,10 @@ var expt = {
     rmse_threshold: 0.5,
     rmse_match: 'color',
     saveURL: 'submit.simple.php',
+    sona: {
+        experiment_id: 1512,
+        credit_token: '04417d3a924f450eb4818b0a73f6c0b0',
+    }
 };
 
 var trial = {
