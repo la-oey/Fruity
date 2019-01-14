@@ -1,0 +1,125 @@
+---
+title: "Fruity_Exp2_Analysis"
+author: "Lauren Oey"
+date: "11/1/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+
+df <- read.csv("raw.csv")
+
+df <- df %>%
+  mutate(order = as.factor(recode(as.character(order), "1"="adj1_adj2", "2"="adj2_adj1")),
+         prosody = as.factor(recode(as.character(prosody), "1"="adj1", "2"="adj2")))
+glimpse(df)
+```
+
+```{r}
+(n <- length(levels(df$subjID)))
+```
+
+```{r}
+catch <- c("spiky artichoke",
+           "sweet beet",
+           "salty plaintain",
+           "green grape",
+           "dark ripe avocado",
+           "bitter sweet okra")
+
+df.exclCrit <- df %>%
+  filter(stimType == "stimFillList") %>%
+  mutate(correct = ifelse(produce %in% catch, as.character(recode(produce,
+                                                                  "spiky artichoke" = "spiky",
+                                                                  "sweet beet" = "sweet",
+                                                                  "salty plaintain" = "salty",
+                                                                  "green grape" = "green",
+                                                                  "dark ripe avocado" = "ripe",
+                                                                  "bitter sweet okra" = "bitter")), NA)) %>%
+  filter(!is.na(correct)) %>%
+  group_by(subjID) %>%
+  summarise(propCorrect = sum(selectedTxt == correct) / n())
+
+ggplot(df.exclCrit, aes(x=propCorrect)) +
+  geom_bar() +
+  ggtitle("Distribution on Catch Trials") +
+  scale_x_continuous("Prop of Correct Performance by Subject", limits = c(0,1.1)) +
+  theme_minimal()
+```
+
+```{r}
+subj.excluded <- df.exclCrit %>%
+  filter(propCorrect < 0.8) %>%
+  .$subjID ;subj.excluded
+length(subj.excluded)
+
+df.final <- df %>%
+  filter(!subjID %in% subj.excluded & stimType != "stimFillList")
+
+df_lm <- df.final %>%
+  mutate(structureGroup = as.factor(ifelse(structureIndex %in% c("a","b"), "ab", "cd")),
+         adjFirst.alph = ifelse(as.character(adjFirst) < as.character(adjSecond), as.character(adjFirst), as.character(adjSecond)),
+         adjSecond.alph = ifelse(as.character(adjFirst) > as.character(adjSecond), as.character(adjFirst), as.character(adjSecond)),
+         adjPairing.alph = paste0(adjFirst.alph, "_", adjSecond.alph),
+         adjSelected.isAlph = as.numeric(as.character(selectedTxt) == as.character(adjFirst.alph)),
+         syntOrder.alph = ifelse(adjFirst == adjFirst.alph, "alphOrder.true", "alphOrder.false"))
+```
+```{r}
+df2 <- df_lm %>%
+  group_by(prosody, subjID) %>%
+  summarise(percAdj2.subj = sum(as.numeric(as.character(selectedTxt) == as.character(adjSecond))) / n())
+
+summary2 <- df2 %>%
+  group_by(prosody) %>%
+  summarise(prop = mean(percAdj2.subj),
+            se = sqrt(prop*(1-prop)/n),
+            lower = max(prop - 1.96*se, 0),
+            upper = min(prop + 1.96*se, 1))
+
+df2 %>%
+  ggplot(aes(x=as.factor(prosody))) +
+  geom_dotplot(aes(y=percAdj2.subj),binaxis="y",stackdir="center", fill="blue", alpha=0.5) +
+  geom_pointrange(data=summary2, aes(y = prop, ymin=lower, ymax=upper), colour="darkblue") +
+  geom_errorbar(data=summary2, aes(ymin=lower, ymax=upper), width=0.2) +
+  ggtitle(bquote("Proportion of"*~A[2]*" Choices in"*~A[1]*~A[2]*" N")) +
+  scale_x_discrete("Prosody", labels=c("Adj1", "Adj2")) +
+  scale_y_continuous(bquote("Prop of"*~A[2]*" Chosen"), limits=c(0,1)) +
+  geom_hline(yintercept=0.5, linetype=2) +
+  theme_minimal()
+ggsave("img/Results_prosody.png")
+```
+
+
+Full Model w/ Interaction between Adjective Ordering, Prosody, and Scale Dimensionality
+
+Dependent measure is binary, in which selected text == alphabetically first adjective (alphabetical anchoring)
+
+Adjective Ordering (syntOrder.alph) refers to whether the alphabetically first adjective is the first or second adjective in terms of word ordering
+
+Prosody (prosody) refers to which adjective has a prosodic emphasis
+
+Scale Dimensionality (stimType) refers to whether the two adjectives are on the same scale or different scales
+
+Random intercepts for subject and stimulus (noun)
+
+Full model has a significant effect of word ordering (as predicted), slight signif effect of syntactic structure and signif interaction between word ordering and syntactic structure
+
+
+```{r}
+model <- glmer(cbind(adjSelected.isAlph, 1-adjSelected.isAlph) ~ syntOrder.alph * prosody * stimType  + (1 | subjID) + (1 | produce),
+               data=df_lm, family="binomial")
+summary(model)
+```
+
+This is the model that should be reported. It shows adjective ordering and prosody and their interaction are significant predictors of selection.
+
+```{r}
+model2 <- glmer(cbind(adjSelected.isAlph, 1-adjSelected.isAlph) ~ syntOrder.alph * prosody + (1 | subjID) + (1 | produce),
+               data=df_lm, family="binomial")
+summary(model2)
+```
+

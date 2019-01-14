@@ -1,0 +1,205 @@
+---
+title: "Fruity Exp1 in-lab Analysis"
+author: "Lauren Oey"
+date: "1/13/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+
+df <- read.csv("raw.csv")
+glimpse(df)
+```
+
+```{r}
+(n <- length(levels(df$subjID)))
+```
+
+```{r}
+catch <- c("spiky artichoke",
+           "sweet beet",
+           "salty plaintain",
+           "green grape",
+           "dark ripe avocado",
+           "bitter sweet okra")
+
+df.exclCrit <- df %>%
+  filter(stimType == "stimFillList") %>%
+  mutate(correct = ifelse(produce %in% catch, as.character(recode(produce,"spiky artichoke" = "spiky",
+  "sweet beet" = "sweet",
+  "salty plaintain" = "salty",
+  "green grape" = "green",
+  "dark ripe avocado" = "ripe",
+  "bitter sweet okra" = "bitter")), NA)) %>%
+  filter(!is.na(correct)) %>%
+  group_by(subjID) %>%
+  summarise(propCorrect = sum(selectedTxt == correct) / n())
+
+ggplot(df.exclCrit, aes(x=propCorrect)) +
+  geom_bar() +
+  ggtitle("Distribution on Catch Trials") +
+  scale_x_continuous("Prop of Correct Performance by Subject", limits = c(0,1.1)) +
+  theme_minimal()
+```
+
+```{r}
+subj.excluded <- df.exclCrit %>%
+  filter(propCorrect < 0.8) %>%
+  .$subjID ;subj.excluded
+length(subj.excluded)
+
+df.final <- df %>%
+  filter(!subjID %in% subj.excluded & stimType != "stimFillList")
+
+df_lm <- df.final %>%
+  mutate(structureGroup = as.factor(ifelse(structureIndex %in% c("a","b"), "ab", "cd")),
+         adjFirst.alph = ifelse(as.character(adjFirst) < as.character(adjSecond), as.character(adjFirst), as.character(adjSecond)),
+         adjSecond.alph = ifelse(as.character(adjFirst) > as.character(adjSecond), as.character(adjFirst), as.character(adjSecond)),
+         adjPairing.alph = paste0(adjFirst.alph, "_", adjSecond.alph),
+         adjSelected.isAlph = as.numeric(as.character(selectedTxt) == as.character(adjFirst.alph)),
+         syntOrder.alph = ifelse(adjFirst == adjFirst.alph, "alphOrder.true", "alphOrder.false"))
+```
+
+
+```{r}
+df1 <- df.final %>%
+  filter(structureIndex %in% c("c","d")) %>%
+  group_by(as.factor(stimType)) %>%
+  mutate(selectedTxt.l.adj2 = as.numeric(as.character(selectedTxt) == as.character(adjSecond))) %>%
+  group_by(stimType, subjID) %>%
+  summarise(percAdj2.subj = sum(selectedTxt.l.adj2) / n())
+
+summary1 <- df1 %>%
+  group_by(stimType) %>%
+  summarise(prop = mean(percAdj2.subj),
+            se = sqrt(prop*(1-prop)/n),
+            lower = max(prop - 1.96*se, 0),
+            upper = min(prop + 1.96*se, 1))
+
+df1 %>%
+  ggplot(aes(x=stimType)) +
+  geom_dotplot(aes(y=percAdj2.subj),binaxis="y",stackdir="center", fill="blue", alpha=0.5) +
+  geom_pointrange(data=summary1, aes(x=stimType, y = prop, ymin=lower, ymax=upper), colour="darkblue") +
+  geom_errorbar(data=summary1, aes(x=stimType, ymin=lower, ymax=upper), width=0.2) +
+  ggtitle(bquote("Proportion of"*~A[2]*" Choices in"*~A[1]*" for a"~A[2]*" N by Scale (Control)")) +
+  scale_x_discrete("Scale", labels=c("Same Scale", "Different Scale")) +
+  scale_y_continuous(bquote("Prop of"*~A[2]*" Chosen"), limits=c(0,1)) +
+  geom_hline(yintercept=0.5, linetype=2) +
+  theme_minimal()
+ggsave("img/Results_periphrastic.png")
+```
+
+
+
+```{r}
+df2 <- df.final %>%
+  filter(structureIndex %in% c("a","b")) %>%
+  group_by(as.factor(stimType)) %>%
+  mutate(selectedTxt.l.adj2 = as.numeric(as.character(selectedTxt) == as.character(adjSecond))) %>%
+  group_by(stimType, subjID) %>%
+  summarise(percAdj2.subj = sum(selectedTxt.l.adj2) / n())
+
+summary2 <- df2 %>%
+  group_by(stimType) %>%
+  summarise(prop = mean(percAdj2.subj),
+            se = sqrt(prop*(1-prop)/n),
+            lower = max(prop - 1.96*se, 0),
+            upper = min(prop + 1.96*se, 1))
+
+df2 %>%
+  ggplot(aes(x=stimType)) +
+  geom_dotplot(aes(y=percAdj2.subj),binaxis="y",stackdir="center", fill="blue", alpha=0.5) +
+  geom_pointrange(data=summary2, aes(y = prop, ymin=lower, ymax=upper), colour="darkblue") +
+  geom_errorbar(data=summary2, aes(ymin=lower, ymax=upper), width=0.2) +
+  ggtitle(bquote("Proportion of"*~A[2]*" Choices in"*~A[1]*~A[2]*" N by Scale (Test)")) +
+  scale_x_discrete("Scale", labels=c("Same Scale", "Different Scale")) +
+  scale_y_continuous(bquote("Prop of"*~A[2]*" Chosen"), limits=c(0,1)) +
+  geom_hline(yintercept=0.5, linetype=2) +
+  theme_minimal()
+ggsave("img/Results_double.png")
+```
+
+```{r}
+df3 <- df.final %>%
+  mutate(selectedTxt.l.adj2 = as.numeric(as.character(selectedTxt) == as.character(adjSecond)),
+         structureGroup = ifelse(structureIndex %in% c("a","b"), "ab", "cd")) %>%
+  group_by(structureGroup, subjID) %>%
+  summarise(percAdj2.subj = sum(selectedTxt.l.adj2) / n())
+
+summary3 <- df3 %>%
+  group_by(structureGroup) %>%
+  summarise(prop = mean(percAdj2.subj),
+            se = sqrt(prop*(1-prop)/n),
+            lower = max(prop - 1.96*se, 0),
+            upper = min(prop + 1.96*se, 1))
+
+df3 %>%
+  ggplot(aes(x=structureGroup)) +
+  geom_dotplot(aes(y=percAdj2.subj),binaxis="y",stackdir="center", fill="blue", alpha=0.5) +
+  geom_pointrange(data=summary3, aes(y = prop, ymin=lower, ymax=upper), colour="darkblue") +
+  geom_errorbar(data=summary3, aes(ymin=lower, ymax=upper), width=0.2) +
+  ggtitle(bquote("Proportion of"*~A[2]*" Choices by Syntax")) +
+  scale_x_discrete("Syntactic Structure", labels=c(bquote(~A[1]*~A[2]*" N"), bquote(~A[1]*" for a"~A[2]*" N"))) +
+  scale_y_continuous(bquote("Prop of"*~A[2]*" Chosen"), limits=c(0,1.05)) +
+  geom_hline(yintercept=0.5, linetype=2) +
+  theme_minimal()
+ggsave("img/Results_bySyntax.png")
+```
+
+Full Model w/ Interaction between Adjective Ordering, Syntactic Structure, and Scale Dimensionality
+
+Dependent measure is binary, in which selected text == alphabetically first adjective (alphabetical anchoring)
+
+Adjective Ordering (syntOrder.alph) refers to whether the alphabetically first adjective is the first or second adjective in terms of word ordering
+
+Syntactic Structure (structureGroup) refers to whether the sentence takes the form "Adj1 for a Adj2 N" or "Adj1 Adj2 N"
+
+Scale Dimensionality (stimType) refers to whether the two adjectives are on the same scale or different scales
+
+Random intercepts for subject and stimulus (noun)
+
+
+Full model has a significant effect of word ordering (as predicted), slight interaction between word ordering and scale and between word ordering, scale, and syntactic structure
+
+No interaction between adjective ordering and syntactic structure is surprising but probably due to large number of variables
+
+
+```{r}
+model <- glmer(cbind(adjSelected.isAlph, 1-adjSelected.isAlph) ~ syntOrder.alph * structureGroup * stimType  + (1 | subjID) + (1 | produce),
+               data=df_lm, family="binomial")
+summary(model)
+```
+
+This is the model that should be reported. It just shows that adjective ordering is a significant predictor of selection.
+
+```{r}
+model2 <- glmer(cbind(adjSelected.isAlph, 1-adjSelected.isAlph) ~ syntOrder.alph + (1 | subjID) + (1 | produce),
+               data=df_lm, family="binomial")
+summary(model2)
+```
+
+```{r}
+contrasts(df_lm$structureGroup) <- contr.sum(2)
+
+model3 <- glmer(cbind(adjSelected.isAlph, 1-adjSelected.isAlph) ~ syntOrder.alph * structureGroup + (1 | subjID) + (1 | produce),
+               data=df_lm, family="binomial")
+summary(model3)
+```
+
+```{r}
+df.final %>%
+  mutate(selectedTxt.l.adj2 = as.numeric(as.character(selectedTxt) == as.character(adjSecond))) %>%
+  group_by(produce, stimType) %>%
+  summarise(percAdj2.subj = sum(selectedTxt.l.adj2) / n()) %>%
+  ggplot(aes(x=percAdj2.subj, fill=stimType)) +
+  geom_density(alpha = 0.5) +
+  ggtitle("Distribution of Selection by Noun") +
+  scale_fill_discrete(labels=c("Same Scale", "Different Scale")) +
+  scale_x_continuous(bquote("Prop of"*~A[2]*" Chosen"), limits=c(0,1)) +
+  scale_y_continuous("Density") +
+  theme_minimal()
+```
